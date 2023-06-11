@@ -9,6 +9,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        Console.WriteLine("Initializing...");
         var wordList = new WordList();
 
         var trie = new PrefixTree();
@@ -36,9 +37,9 @@ class Program
             var trieResult = await trie.Search(query);
             trieStopwatch.Stop();
 
-            if (trieResult?.SelectMany(x => x).ToList().Count > 0)
+            if (trieResult?.ToList().Count > 0)
             {
-                foreach (var word in trieResult.SelectMany(x => x))
+                foreach (var word in trieResult)
                 {
                     Console.WriteLine(word);
                 }
