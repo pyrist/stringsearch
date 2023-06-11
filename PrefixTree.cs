@@ -17,16 +17,17 @@ public class PrefixTree
     /// <summary>
     /// Returns all entries in the trie whose first letters match the <paramref name="query"/>.
     /// </summary>
-    public async Task<IEnumerable<string>[]> Search(string query)
+    public async Task<IEnumerable<string>> Search(string query)
     {
         var lowestMatchingNode = FindDeepestMatchingNode(query);
 
         if (lowestMatchingNode.Depth == query.Length)
         {
-            return await Task.WhenAll(lowestMatchingNode.Children.Select(child => SearchWorker(query, child)));
+            var result = await Task.WhenAll(lowestMatchingNode.Children.Select(child => SearchWorker(query, child)));
+            return result.SelectMany(x => x);
         }
 
-        return null;
+        return new List<string>();
     }
 
     /// <summary>
@@ -45,8 +46,6 @@ public class PrefixTree
                 current.Children.Add(newNode);
                 current = newNode;
             }
-
-            current.Children.Add(new Node('$', current.Depth + 1, current));
         }
     }
 
@@ -97,7 +96,7 @@ public class PrefixTree
     {
         var sb = new StringBuilder();
         sb.Append(parent.Value);
-        return RecursiveSuffixCollector(parent, sb).Select(suffix => suffix.TrimEnd('$'));
+        return RecursiveSuffixCollector(parent, sb);
     }
 
     /// <summary>
