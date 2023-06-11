@@ -1,4 +1,7 @@
-namespace vectorTakehome;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace stringsearch;
 
 public class Node
 {
