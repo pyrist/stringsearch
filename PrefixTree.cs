@@ -26,7 +26,8 @@ public class PrefixTree
             var result = await Task.WhenAll(lowestMatchingNode.Children.Select(child => SearchWorker(query, child)));
             var resultList = result.SelectMany(x => x);
 
-            if (lowestMatchingNode.IsEndOfWord) {
+            if (lowestMatchingNode.IsEndOfWord)
+            {
                 resultList = resultList.Append(query);
             }
 
@@ -127,13 +128,12 @@ public class PrefixTree
                     yield return value;
                 }
 
-                if (current.Length == (child.Depth - queryLength) 
-                && child.IsEndOfWord && child.Children.Count > 0)
-                {
-                    yield return current.ToString();
-                }
+                current.Length--;
+            }
 
-                --current.Length;
+            if (parent.IsEndOfWord && current.Length == (parent.Depth - queryLength))
+            {
+                yield return current.ToString();
             }
         }
     }
