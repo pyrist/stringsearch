@@ -11,7 +11,7 @@ public class PrefixTree
 
     public PrefixTree()
     {
-        root = new Node('+', 0, null);
+        root = new Node('+', 0, false, null);
     }
 
     /// <summary>
@@ -24,7 +24,13 @@ public class PrefixTree
         if (lowestMatchingNode.Depth == query.Length)
         {
             var result = await Task.WhenAll(lowestMatchingNode.Children.Select(child => SearchWorker(query, child)));
-            return result.SelectMany(x => x);
+            var resultList = result.SelectMany(x => x);
+
+            if (lowestMatchingNode.IsEndOfWord) {
+                resultList = resultList.Append(query);
+            }
+
+            return resultList;
         }
 
         return new List<string>();
@@ -42,10 +48,12 @@ public class PrefixTree
 
             for (var i = current.Depth; i < item.Length; i++)
             {
-                var newNode = new Node(item[i], current.Depth + 1, current);
+                var newNode = new Node(item[i], current.Depth + 1, false, current);
                 current.Children.Add(newNode);
                 current = newNode;
             }
+
+            current.IsEndOfWord = true;
         }
     }
 
@@ -76,7 +84,7 @@ public class PrefixTree
         var task = new Task<List<string>>(() =>
         {
             var result = new List<string>();
-            var suffixList = CollectSuffixOptions(node);
+            var suffixList = CollectSuffixOptions(node, query.Length);
             foreach (var suffix in suffixList)
             {
                 result.Add(query + suffix);
@@ -92,19 +100,19 @@ public class PrefixTree
     /// <summary>
     /// Collects possible suffixes for any traversal that continues after the node <paramref name="parent"/>.
     /// </summary>
-    private static IEnumerable<string> CollectSuffixOptions(Node parent)
+    private static IEnumerable<string> CollectSuffixOptions(Node parent, int queryLength)
     {
         var sb = new StringBuilder();
         sb.Append(parent.Value);
-        return RecursiveSuffixCollector(parent, sb);
+        return RecursiveSuffixCollector(parent, sb, queryLength);
     }
 
     /// <summary>
     /// Recursively extends possible suffixes for any traversal that continues after the node <paramref name="parent"/>.
     /// </summary>
-    private static IEnumerable<string> RecursiveSuffixCollector(Node parent, StringBuilder current)
+    private static IEnumerable<string> RecursiveSuffixCollector(Node parent, StringBuilder current, int queryLength)
     {
-        if (parent.Children.Count == 0)
+        if (parent.IsEndOfWord && parent.Children.Count == 0)
         {
             yield return current.ToString();
         }
@@ -114,9 +122,15 @@ public class PrefixTree
             {
                 current.Append(child.Value);
 
-                foreach (var value in RecursiveSuffixCollector(child, current))
+                foreach (var value in RecursiveSuffixCollector(child, current, queryLength))
                 {
                     yield return value;
+                }
+
+                if (current.Length == (child.Depth - queryLength) 
+                && child.IsEndOfWord && child.Children.Count > 0)
+                {
+                    yield return current.ToString();
                 }
 
                 --current.Length;

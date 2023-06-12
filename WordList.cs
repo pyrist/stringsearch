@@ -10,6 +10,9 @@ class WordList : List<string>
     public WordList(int wordLength = 4)
     {
         this.AddRange(GenerateWordList(wordLength));
+        this.Add("APP");
+        this.Add("APPLE");
+        this.Add("APPLEPIE");
     }
 
     /// <summary>

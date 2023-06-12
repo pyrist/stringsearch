@@ -9,12 +9,14 @@ public class Node
     public List<Node> Children { get; set; }
     public Node? Parent { get; set; }
     public int Depth { get; set; }
+    public bool IsEndOfWord { get; set; }
 
-    public Node(char value, int depth, Node? parent)
+    public Node(char value, int depth, bool isEndOfWord, Node? parent)
     {
         Value = value;
         Children = new List<Node>();
         Depth = depth;
+        IsEndOfWord = isEndOfWord;
         Parent = parent;
     }
 
