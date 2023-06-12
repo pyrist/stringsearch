@@ -43,7 +43,8 @@ class Program
                 {
                     Console.WriteLine(word);
                 }
-                Console.WriteLine($"\nPLINQ search time: {plinqStopwatch.ElapsedMilliseconds} ms / {plinqStopwatch.ElapsedTicks} ticks");
+                Console.WriteLine($"\nSearch results: {trieResult?.ToList().Count}");
+                Console.WriteLine($"PLINQ search time: {plinqStopwatch.ElapsedMilliseconds} ms / {plinqStopwatch.ElapsedTicks} ticks");
                 Console.WriteLine($"Trie search time: {trieStopwatch.ElapsedMilliseconds} ms / {trieStopwatch.ElapsedTicks} ticks (+ {trieInsertionStopwatch.ElapsedMilliseconds} ms for insertion)\n");
             }
             else
